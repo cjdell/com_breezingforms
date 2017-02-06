@@ -8,6 +8,17 @@
  * */
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
+function loggly($message) {
+    $curl = curl_init();
+    curl_setopt($curl, CURLOPT_URL, 'http://logs-01.loggly.com/bulk/b3a71ff2-7208-450e-866b-0da126d3555e/tag/bulk/');
+    curl_setopt($curl, CURLOPT_POST, true);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $message);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: text/plain'));
+    $response = curl_exec($curl);
+    curl_close($curl);
+}
+
 jimport('joomla.filesystem.file');
 jimport('joomla.filesystem.folder');
 
@@ -5340,6 +5351,15 @@ class HTML_facileFormsProcessor {
             $recipient = $this->formrow->emailadr;
         else
             $recipient = $ff_config->emailadr;
+
+        // smdcredit modifications...
+        loggly('sendEmailNotification: ' . json_encode($this->maildata));
+
+        // foreach ($this->maildata as $DATA) {
+        //     if ($DATA[_FF_DATA_NAME] === 'Email') {
+        //         $recipient = $DATA[_FF_DATA_VALUE];
+        //     }
+        // }
 
         $recipients = explode(';', $recipient);
         $recipientsSize = count($recipients);
