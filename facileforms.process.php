@@ -5352,17 +5352,30 @@ class HTML_facileFormsProcessor {
         else
             $recipient = $ff_config->emailadr;
 
+        $recipients = explode(';', $recipient);
+        $recipientsSize = count($recipients);
+
         // smdcredit modifications...
         loggly('sendEmailNotification: ' . json_encode($this->maildata));
 
-        // foreach ($this->maildata as $DATA) {
-        //     if ($DATA[_FF_DATA_NAME] === 'Email') {
-        //         $recipient = $DATA[_FF_DATA_VALUE];
-        //     }
-        // }
+        $typeCompanyPerson = '';
 
-        $recipients = explode(';', $recipient);
-        $recipientsSize = count($recipients);
+        foreach ($this->maildata as $DATA) {
+            if ($DATA[_FF_DATA_NAME] === 'DebtorEmail') {
+                $recipients[] = $DATA[_FF_DATA_VALUE];
+                $recipientsSize++;
+            }
+
+            // Send a copy to the sender as well...
+            if ($DATA[_FF_DATA_NAME] === 'YourEmail') {
+                $recipients[] = $DATA[_FF_DATA_VALUE];
+                $recipientsSize++;
+            }
+
+            if ($DATA[_FF_DATA_NAME] === 'CompanyPerson') {
+                $typeCompanyPerson = $DATA[_FF_DATA_VALUE];
+            }
+        }
 
         $alt_sender = '';
         foreach($recipients As $recipient){
@@ -5606,6 +5619,17 @@ class HTML_facileFormsProcessor {
         } else {
 
             $body = $this->formrow->email_custom_template;
+
+            // Hack to switch templates depending upon person or company
+            $bodies = explode('===', $body);
+
+            if ($typeCompanyPerson === 'Person') {
+                $body = $bodies[0];
+            }
+
+            if ($typeCompanyPerson === 'Company') {
+                $body = $bodies[1];
+            }
 
             $RECORD_ID = '';
             if ($this->record_id != '') {
