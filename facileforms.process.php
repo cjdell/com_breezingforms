@@ -5370,6 +5370,13 @@ class HTML_facileFormsProcessor {
             if ($DATA[_FF_DATA_NAME] === 'YourEmail') {
                 $recipients[] = $DATA[_FF_DATA_VALUE];
                 $recipientsSize++;
+
+                // $alt_mailfrom = $DATA[_FF_DATA_VALUE];
+            }
+
+            // Change the from name to be the person filling out the form
+            if ($DATA[_FF_DATA_NAME] === 'YourName') {
+                $fromname = $DATA[_FF_DATA_VALUE];
             }
 
             if ($DATA[_FF_DATA_NAME] === 'CompanyPerson') {
